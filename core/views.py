@@ -18,8 +18,7 @@ class RegisterAPI(APIView):
                 return Response({'user_err':'user already exists'}, status=403)
             else:
                 User.objects.create_user(username=username, email=email, password=password)
-                return Response({'success':'user created successfully'}, status=201)
-            
+                return Response({'success':'user created successfully'}, status=201)    
         else:
             return Response(serial.errors, status=400)
 
