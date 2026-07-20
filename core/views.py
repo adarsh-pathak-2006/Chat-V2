@@ -19,7 +19,7 @@ class RegisterAPI(APIView):
             email=serial.validated_data['email']
             password=serial.validated_data['password']
 
-            if User.objects.filter(username=username, email=email).exists():
+            if User.objects.filter(Q(username=username) | Q(email=email)).exists():
                 return Response({'user_err':'user already exists'}, status=403)
             else:
                 User.objects.create_user(username=username, email=email, password=password)
