@@ -4,9 +4,13 @@ from django.contrib.auth.models import User
 from core.serializers import ChatSerializer, ConversationGetSerializer, ConversationPostSerializer, RegisterSerailizer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from chat.throttles import RegisterationThrottle, TokenObtainThrottle, GeneralThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class RegisterAPI(APIView):
+    throttle_classes=[RegisterationThrottle]
     def post(self, request):
         serial=RegisterSerailizer(data=request.data)
         if serial.is_valid():
@@ -21,9 +25,14 @@ class RegisterAPI(APIView):
                 return Response({'success':'user created successfully'}, status=201)    
         else:
             return Response(serial.errors, status=400)
+        
+class CustomTokenObtainView(TokenObtainPairView):
+    throttle_classes=[TokenObtainThrottle]
 
 
 class ChatAPI(APIView):
+    permission_classes=[IsAuthenticated]
+    throttle_classes=[GeneralThrottle]
     def get(self, request):
         data=Chat.objects.filter(user=request.user)
         serial=ChatSerializer(data, many=True)
