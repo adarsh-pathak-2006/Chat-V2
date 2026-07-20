@@ -27,4 +27,5 @@ class ChatSerializer(ModelSerializer):
     convo=ConversationGetSerializer(read_only=True, many=True)
     class Meta:
         model=Chat
-        fields=['user', 'user2', 'convo']
+        fields=['id', 'user', 'user2', 'convo']
+        read_only_fields = ['user']
