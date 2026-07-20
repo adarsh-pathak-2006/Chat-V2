@@ -18,10 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from core.views import RegisterAPI, CustomTokenObtainView
 from rest_framework_simplejwt.views import TokenRefreshView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('core.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name='schema'), name="swagger_ui"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name='schema'), name="redoc"),
     path('register/', RegisterAPI.as_view(), name='register'),
     path('token/', CustomTokenObtainView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
