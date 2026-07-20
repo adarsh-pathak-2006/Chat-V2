@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from chat.throttles import RegisterationThrottle, TokenObtainThrottle, GeneralThrottle
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.db.models import Q
 
 
 class RegisterAPI(APIView):
@@ -18,7 +19,7 @@ class RegisterAPI(APIView):
             email=serial.validated_data['email']
             password=serial.validated_data['password']
 
-            if User.objects.filter(username=username).exists():
+            if User.objects.filter(username=username, email=email).exists():
                 return Response({'user_err':'user already exists'}, status=403)
             else:
                 User.objects.create_user(username=username, email=email, password=password)
@@ -34,7 +35,7 @@ class ChatAPI(APIView):
     permission_classes=[IsAuthenticated]
     throttle_classes=[GeneralThrottle]
     def get(self, request):
-        data=Chat.objects.filter(user=request.user)
+        data=Chat.objects.filter(Q(user=request.user) | Q(user2=request.user))
         serial=ChatSerializer(data, many=True)
         return Response(serial.data, status=200)
     
@@ -48,15 +49,15 @@ class ChatAPI(APIView):
         
 class ConversationAPI(APIView):
     def get(self, request, pk):
-        chat_data=get_object_or_404(Chat, user=request.user, id=pk)
-        data=Conversation.objects.filter(chat=chat_data, user=request.user)
+        chat_data=get_object_or_404(Chat, Q(user=request.user) | Q(user2=request.user), id=pk)
+        data=Conversation.objects.filter(chat=chat_data)
         serial=ConversationGetSerializer(data, many=True)
         return Response(serial.data, status=200)
     
     def post(self, request, pk):
         serial=ConversationPostSerializer(data=request.data)
         if serial.is_valid():
-            chat_data=get_object_or_404(Chat, user=request.user, id=pk)
+            chat_data=get_object_or_404(Chat, Q(user=request.user) | Q(user2=request.user), id=pk)
             serial.save(chat=chat_data, user=request.user)
             return Response(serial.data, status=201)
         else:
