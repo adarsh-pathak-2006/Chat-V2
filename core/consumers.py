@@ -4,7 +4,6 @@ from asgiref.sync import async_to_sync
 
 from channels.generic.websocket import WebsocketConsumer
 
-from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from core.models import Chat, Conversation
@@ -24,12 +23,9 @@ class ChatConsumer(WebsocketConsumer):
             self.close()
             return
 
-        self.chat = get_object_or_404(
-            Chat,
-            id=self.chat_id,
-        )
+        self.chat = Chat.objects.filter(id=self.chat_id).first()
 
-        if user != self.chat.user and user != self.chat.user2:
+        if not self.chat or (user != self.chat.user and user != self.chat.user2):
             self.close()
             return
 
