@@ -19,10 +19,9 @@ class ConversationGetSerializer(ModelSerializer):
         fields=['user', 'message', 'time']
 
 class ConversationPostSerializer(ModelSerializer):
-    user=UserSerializer(read_only=True)
     class Meta:
         model=Conversation
-        fields=['user' ,'message', 'time']
+        fields=['message', 'time']
 
 class ChatSerializer(ModelSerializer):
     convo=ConversationGetSerializer(read_only=True)
