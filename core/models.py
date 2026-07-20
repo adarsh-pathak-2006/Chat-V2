@@ -12,6 +12,7 @@ class Chat(models.Model):
         return self.user.username
     
 class Conversation(models.Model):
+    user=models.ForeignKey(User, on_delete=models.CASCADE)
     chat=models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='convo')
     message=models.TextField()
     time=models.DateTimeField(auto_now_add=True)

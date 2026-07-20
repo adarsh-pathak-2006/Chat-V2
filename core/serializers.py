@@ -12,13 +12,20 @@ class UserSerializer(ModelSerializer):
         model=User
         fields=['username', 'email']
 
-class ConversationSerializer(ModelSerializer):
+class ConversationGetSerializer(ModelSerializer):
+    user=UserSerializer(read_only=True)
     class Meta:
         model=Conversation
-        fields=['message', 'time']
+        fields=['user', 'message', 'time']
+
+class ConversationPostSerializer(ModelSerializer):
+    user=UserSerializer(read_only=True)
+    class Meta:
+        model=Conversation
+        fields=['user' ,'message', 'time']
 
 class ChatSerializer(ModelSerializer):
-    convo=ConversationSerializer(read_only=True)
+    convo=ConversationGetSerializer(read_only=True)
     class Meta:
         model=Chat
         fields=['user', 'user2', 'convo']
